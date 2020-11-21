@@ -1,0 +1,2 @@
+# Usage: mcsampler <lambda> <nsteps> <nstride> <xinit> <outfile> randseed
+./mcsampler 1.0 1000000000 1000 2.1 long_1e9_0.txt  1

@@ -1,0 +1,1 @@
+g++ mcsampler.cc -o mcsampler

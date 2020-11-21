@@ -1,0 +1,6 @@
+# delF_MLE	delF_MLE_known_pi	delF_weighted_MLE	delF_rownorm	delF_corr (all in kcal/mol)
+1.531364697145916054e+00
+3.999928788107288913e+00
+4.004958977634097472e+00
+1.454251949398811661e+01
+inf

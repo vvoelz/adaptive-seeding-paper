@@ -1,0 +1,246 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% This is a (brief) model paper using the achemso class
+%% The document class accepts keyval options, which should include
+%% the target journal and optionally the manuscript type.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[journal=jctcce,manuscript=article]{achemso}
+\setkeys{acs}{usetitle = true}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Place any additional packages needed here.  Only include packages
+%% which are essential, to avoid problems later. Do NOT use any
+%% packages which require e-TeX (for example etoolbox): the e-TeX
+%% extensions are not currently available on the ACS conversion
+%% servers.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[version=3]{mhchem} 
+\usepackage[T1]{fontenc}   
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx, subfigure}
+\usepackage{wrapfig}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[section]{placeins}
+\usepackage{hyperref}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% If issues arise when submitting your manuscript, you may want to
+%% un-comment the next line.  This provides information on the
+%% version of every file you have used.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%\listfiles
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Place any additional macros here.  Please use \newcommand* where
+%% possible, and avoid layout-changing macros (which are not used
+%% when typesetting).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand*\mycommand[1]{\texttt{\emph{#1}}}
+
+
+%%%% Added to fix Supplemental Info Figure and Table numbering:
+%% Taken from: http://bytesizebio.net/2013/03/11/adding-supplementary-tables-and-figures-in-latex/
+\newcommand{\beginsupplement}{%
+        \setcounter{table}{0}
+        \renewcommand{\thetable}{S\arabic{table}}%
+        \setcounter{figure}{0}
+        \renewcommand{\thefigure}{S\arabic{figure}}%
+     }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Meta-data block
+%% ---------------
+%% Each author should be given as a separate \author command.
+%%
+%% Corresponding authors should have an e-mail given after the author
+%% name as an \email command. Phone and fax numbers can be given
+%% using \phone and \fax, respectively; this information is optional.
+%%
+%% The affiliation of authors is given after the authors; each
+%% \affiliation command applies to all preceding authors not already
+%% assigned an affiliation.
+%%
+%% The affiliation takes an option argument for the short name.  This
+%% will typically be something like "University of Somewhere".
+%%
+%% The \altaffiliation macro should be used for new address, etc.
+%% On the other hand, \alsoaffiliation is used on a per author basis
+%% when authors are associated with multiple institutions.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\author{Hongbin Wan}
+\author{Vincent A. Voelz}
+\email{vvoelz@temple.edu}
+\affiliation[Temple University]
+{Department of Chemistry, Temple University, Philadelphia, PA 19122, USA}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% The document title should be given as usual. Some journals require
+%% a running title from the author: this should be supplied as an
+%% optional argument to \title.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\title{Adaptive seeding with short trajectories for protein folding landscapes}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Some journals require a list of abbreviations or keywords to be
+%% supplied. These should be set up here, and will be printed after
+%% the title and author information, if needed.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\abbreviations{IR,NMR,UV}
+\keywords{kinetics, molecular simulation, Markov State Models}
+
+\begin{document}
+
+
+\begin{abstract}
+Abstract goes here!
+\end{abstract}
+
+%\maketitle
+
+% \listoftodos
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% The "tocentry" environment can be used to create an entry for the
+%% graphical table of contents. It is given here as some journals
+%% require that it is printed as part of the abstract page. It will
+%% be automatically moved as appropriate.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\begin{tocentry}
+%\end{tocentry}
+
+%%%%%%%%%%%%%%%%%%%%%%%
+%%%--------Abstract-------%%%%
+%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%---Section Dividing Line---%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%---Section Dividing Line---%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\section*{Introduction}
+
+In the last decade, new Markov State Model (MSM) methodologies have made possible accurate and efficient estimation of kinetic rates and reactive pathways for slow and complex biomolecular dynamics, including protein folding,\cite{} ligand binding,\cite{} and conformational allostery.\cite{}  One of the key advantages  touted by MSM methods is the ability to use large ensembles of short-timescale trajectories for sampling events that occur on slow timescales.  If enough parallel sampling from short trajectories can be achieved, this can circumvent the need to sample long trajectories.
+
+Many ``adaptive'' methods have been used for the purpose of accelerating sampling of MSMs.  The simplest of these can be called \textit{adaptive seeding}, where one or more new rounds of unbiased simulation are performed by initiating swarms of trajectories ``seeded'' throughout the landscape. The choice of seeds are based on some initial guess for the energy landscape, possibly from non-equilibrium or  enhanced-sampling methods.
+
+Another kind of adaptive method is \textit{adaptive sampling}, where successive rounds of seeding are performed in order to better sample states of interest.  A popular adaptive sampling strategy is to start successive rounds of simulations from under-sampled states, for instance, from MSM states with the least number of transition counts.\cite{Doerr:2016}  The FAST algorithm is an adaptive sampling method designed to encourage sampling of states with desired properties.\cite{Bowman:asdsds}    FAST chooses new seeds based on an objective function that balances under-sampling with some target structural observable.  Weighted-ensemble (WE) path sampling algorithms can also be classified as adaptive sampling algorithms.  In WE approaches such as WExplore and WESTPA, successive rounds of new trajectories are spawned to better sample a quantity of interest (reactive flux, for example), while the statistical weights of each trajectory are carefully managed so that no bias is introduced.
+
+The above adaptive methods are unbiased, in the sense that each trajectory is sampling from the same, unbiased distribution.  But the sampling is \textit{statistically} biased, in the sense that the observed transitions occur with frequencies that do not correspond to the unbiased distribution.   This statistical bias has interesting consequences in estimating various quantities, consequences which arise from the trade-off between sampling of transition rates versus equilibrium probabilities.  For example, when building MSMs from trajectory data obtained by FAST, it is recommended that row-normalized transition counts be used to estimate the MSM transition matrix,\cite{Zimmerman}  instead of the maximum-likelihood estimator (MLE) that is default in packages like MSMBuilder.\cite{} This is because the MLE enforces detailed balance; i.e. MLE assumes that the observed counts are sampled from the equilibrium distribution, an assumption which is (purposely) violated by adaptive sampling.  One might expect, then, that while quantities like rates and pathways are accurately estimated by adaptive methods, quantities like equilibrium populations may have more uncertainty and/or bias.  Indeed, while the weighted ensemble algorithms have recently been used to efficiently sample very slow folding rates \cite{Zuckermann} ad unbinding rates (residence times > 10 s)\cite{Alex Dickson}, these same algorithms 
+
+In this paper, we consider a specific kind of adaptive method for sampling MSMs: adaptive seeding of perturbed folding landscapes.  It is often the case that large numbers of expensive simulations in a particular force field are utilized to model the folding landscape of a particular protein sequence. We would like to model the folding of a sequence variant, or perhaps use a different force field potential, without having to perform a heroic amount of simulation.  Since there is much prior information from the ``wild-type'' MSM, it is reasonable to think that adaptive seeding could provide a good picture of how folding rates and populations change with the perturbation.  Here, we explore the accuracy of several estimators for obtaining folding rates and populations from adaptive seeding simulations.  
+
+Using a 1-D two-state potential as simple model, we explore different estimators and find interesting differences in their relative accuracies in estimating rates versus equilibrium populations from adaptive seeding trajectory data.  We also explore  the effects of using different trajectory lengths and number of seeds.   In general, we find that rates and free energies are more accurately estimated by estimators that incorporate some prior knowledge of the equilibrium populations. We then show how adaptive seeding can be used to model changes in folding rates and populations for GTT WW domain, based on a 1000-state MSM built from ultra-long simulation trajectories. 
+
+\section*{Results}
+
+\subsection*{Adaptive seeding of a 1-D potential energy surface}
+
+We consider the following potential energy surface, as used by Stelzl et al. (JCTC 2017):  $U(x) = -\frac{2k_BT}{0.596} \ln [ e^{-2(x-2)^2-2} + e^{-2(x-5)^2} ] $
+for $x \in [1.5,5.5]$, and $k_BT = 0.596$ kcal mol$^{-1}$.  The state space is uniformly divided into 20 bins to calculate discrete-state quantities. Diffusion on the 1-D landscape is approximated by a Markov Chain Monte Carlo (MCMC) procedure in which new moves are translations randomly chosen from $\delta \in [-0.05, +0.05]$ and accepted with probability $\min(1, \exp( \beta [U(x+\delta)-U(x)]))$, i.e. the Metropolis criterion.
+
+\begin{figure}[ht!]
+    \includegraphics[width=0.6\columnwidth]{figures/1D-potential/1D-potential}
+    \caption{A 1-D two-state potential}.
+    \label{fig:1D-potential}
+\end{figure}
+
+For all tests with this toy model, we limit the lag time to $\tau =$ 100 steps.  To estimate the ``true'' relaxation timescale of the two-state model, we generated long MCMC trajectories of $10^9$ steps, sampling from a series of scaled potentials $U^{(\lambda)}(x) = \lambda U(x)$ for $\lambda \in [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]$. For each $\lambda$ value, 20 trajectories were generated, with half of them starting from $x=2.0$ and the other half starting from $x=5.0$, resulting in a total of 120 trajectories.  The DTRAM estimator of Wu et al.\cite(Wu:2014) was used to estimate the slowest relaxation timescale as 9.66 ($\pm$ 1.37) $\times 10^6$ steps, using a lag time of 1000 steps.
+
+To emulate adaptive seeding trajectory data, various numbers of trajectories $s$, each of length $n\tau$ were initiated from the center positions of all twenty bins.  The resulting data consists of $20 \times s \times n$ transition counts between states $i$ and $j$ in lag time $\tau$, stored in a 20 $\times$ 20 count matrix of entries $c_{ij}$.  From these counts, estimates of the transition probabilities, $p_{ij}$ can be made.
+
+We explored the accuracy and efficiency of several different transition probability estimators using the adaptive seeding trajectory data as input: (1) a maximum-likelihood estimator (MLE), (2) a MLE estimator where the equilibrium populations $\pi_i$ of each state are known \textit{a priori}, (3) the MLE estimator where each input trajectory is weighted by the \textit{a priori} equilibrium population of its starting point, and (4) row-normalized transition counts.
+
+\paragraph{1. Maximum-likelihood estimator (MLE).} 
+The MLE for a reversible MSM assumes that observed transition counts are independent, and drawn from the equilibrium distribution, so that reversibility (i.e. detailed balance) can be used a constraint.  The likelihood of observing a set of given transition counts, $L = \prod_i \prod_j p_{ij}^{c_{ij}}$, when minimized under the constraint that $\pi_i p_{ij} = \pi_j p_{ji}$, for all $i, j$, yields a self-consistent expression that can be iterated to find the equilibrium populations,\cite{Wu-cit, Prinz2011, Bowman 2009)}
+\begin{equation}
+\pi_i  = \sum_j \frac{c_{ij} + c_{ji}}{\frac{N_j}{\pi_j} + \frac{N_i}{\pi_i}}
+\end{equation}
+where $N_i = \sum_j c_{ij}$.  The transition probabilities $p_{ij}$ are  given by 
+\begin{equation}
+p_{ij} = \frac{(c_{ij} + c_{ji})\pi_j }{N_j\pi_i + N_i\pi_j } 
+\end{equation}
+
+\paragraph{2. Maximum-likelihood estimator (MLE) with known populations $\pi_i$}
+Minimization of the likelihood function above, with the additional constraint of fixed populations $\pi_i$, yields a similar self-consistent equation that can be used to determine a set of Lagrange multipliers,
+\begin{equation}
+\lambda_i  = \sum_j \frac{(c_{ij} + c_{ji})\pi_j \lambda_i}{\lambda_j\pi_i + \lambda_i\pi_j },
+\end{equation}
+from which the transition probabilities $p_{ij}$ can be obtained as
+\begin{equation}
+p_{ij} = \frac{(c_{ij} + c_{ji})\pi_j }{\lambda_j\pi_i + \lambda_i\pi_j }.
+\end{equation}
+
+\paragraph{Maximum-likelihood estimator (MLE) with population-weighted trajectory counts.}
+For this estimator, first a modified count matrix $c_{ij}'$ is calculated, 
+\begin{equation}
+c_{ij}' = \sum_k w^{(k)}c_{ji}^{(k)},
+\end{equation}
+where transition counts $c_{ji}^{(k)}$ from trajectory $k$ are weighted in proportion to $w^{(k)} = \pi^{(k)}$, the equilibrium population of the initial state of the trajectory.  The idea behind this approach is to counteract the statistical bias from adaptive seeding by scaling the observed transition counts proportional to their equilibrium fluxes.  The modified counts are then used as input to the MLE (estimator 1).
+
+\paragraph{Row-normalized counts.}
+For this estimator, the transition probabilities are approximated as
+\begin{equation}
+p_{ij} = \frac{c_{ij}}{\sum_j c_{ij}}.
+\end{equation}
+This approach does not guarantee reversible transition probabilities, which only occurs in the limit of large numbers of reversible transition counts.  In practice, however, the largest eigenvectors of the transition probability matrix have very nearly real eigenvalues, such that we can report relevant relaxation timescales and equilibrium populations. 
+
+\subsection*{Accuracy o
+
+
+
+
+
+\subsection*{Adaptive seeding of protein folding landscapes}
+
+ 
+
+
+\section*{Methods}
+
+\section*{Conclusions}
+
+
+
+\section*{Acknowledgments}
+The authors thank the participants of Folding@home, without whom this work would not be possible.  We graciously acknowledge D. E. Shaw Research for providing access to the WW domain folding trajectory data. This research was supported in part by the National Science Foundation through major research instrumentation grant number CNS-09-58854 and National Institutes of Health grants 1R01GM123296-01 and NIH Research Resource Computer Cluster Grant S10-OD020095.
+
+
+\section*{Supporting Information}
+Figures S1-S15. This information is available free of charge via the Internet at \url{http://pubs.acs.org }
+
+\section*{Appendix}
+
+
+\begin{figure}[ht!]
+    \includegraphics[width=0.6\columnwidth]{figures/DTRAM_bootstrap/dtram_free_energies}
+    \caption{Free energies from dTRAM}.
+    \label{fig:dtram_free_energies}
+\end{figure}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% The appropriate \bibliography command should be placed here.
+%% Notice that the class file automatically sets \bibliographystyle
+%% and also names the section correctly.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliography{seeding}
+
+
+%\newpage
+
+
+%\section*{Table of Contents (TOC) graphic}
+
+
+%\begin{figure}[ht!]
+%\center
+%    \includegraphics[1.0\columnwidth]{figures/TOC}
+%\end{figure}
+
+%%% TOC Figure has been removed  Jan 14, 2016 %%%3
+
+
+\end{document}
